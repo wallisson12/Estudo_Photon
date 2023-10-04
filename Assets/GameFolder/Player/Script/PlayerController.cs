@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int life;
 
     [Header("Photon Settings")]
-    [SerializeField] private PhotonView _photonView;
+    public PhotonView _photonView;
     
     void Start()
     {
@@ -83,6 +83,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    [PunRPC]
     public void Die()
     {
         Destroy(gameObject);

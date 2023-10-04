@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
+using Photon.Realtime;
 
 public class Bullet : MonoBehaviour
 {
@@ -17,7 +19,8 @@ public class Bullet : MonoBehaviour
     {
         if (other.tag == "Enemy")
         {
-            other.GetComponent<PlayerController>().Die();
+            other.GetComponent<PlayerController>()._photonView.RPC("Die", RpcTarget.All);
+            //other.GetComponent<PlayerController>().Die();
             Destroy(gameObject);
         }
         else
@@ -26,6 +29,7 @@ public class Bullet : MonoBehaviour
         }
     }
 
+    [PunRPC]
     public void Shoot(float lag)
     {
         _rbB = GetComponent<Rigidbody2D>();
