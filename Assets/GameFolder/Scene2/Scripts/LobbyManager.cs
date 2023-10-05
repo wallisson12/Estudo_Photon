@@ -11,13 +11,18 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject lobbyPainel,roomPainel;
     [SerializeField] private TextMeshProUGUI roomName;
 
-
+    [Header("Room List")]
     [SerializeField] private RoomItem roomItemPrefab;
     [SerializeField] private List<RoomItem> roomItensList = new List<RoomItem>();
     [SerializeField] private Transform contentObj;
 
     [SerializeField] private float timeBetweenUpdates = 1.5f;
     [SerializeField] private float nextUpdateTime;
+
+    [Header("Player List")]
+    [SerializeField] private List<PlayerItem> playerItemsList = new List<PlayerItem>();
+    [SerializeField] private PlayerItem playerItemPrefab;
+    [SerializeField] private Transform contentObjPI;
   
     void Start()
     {
@@ -38,6 +43,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         lobbyPainel.SetActive(false);
         roomPainel.SetActive(true);
         roomName.text = "Room Name: " + PhotonNetwork.CurrentRoom.Name;
+
+        UpdatePlayerList();
     }
 
     //Called for any change room List (Create,modify,Deleted)
@@ -88,5 +95,50 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         PhotonNetwork.JoinLobby();
+    }
+
+
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+    {
+        UpdatePlayerList();
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        UpdatePlayerList();
+    }
+
+
+    void UpdatePlayerList()
+    {
+        foreach (PlayerItem playerItem in playerItemsList)
+        {
+            Destroy(playerItem.gameObject);
+        }
+
+        playerItemsList.Clear();
+
+
+        if (PhotonNetwork.CurrentRoom != null)
+        {
+            foreach (KeyValuePair<int,Player> player in PhotonNetwork.CurrentRoom.Players)
+            {
+
+                PlayerItem newPlayerItem = Instantiate(playerItemPrefab, contentObjPI);
+                newPlayerItem.SetAttributesPlayer(player.Value);
+
+                if (player.Value == PhotonNetwork.LocalPlayer)
+                {
+                    newPlayerItem.ApplyLocalChanges();
+                }
+
+                playerItemsList.Add(newPlayerItem);
+
+            }
+        }
+        else
+        {
+            return;
+        }
     }
 }
