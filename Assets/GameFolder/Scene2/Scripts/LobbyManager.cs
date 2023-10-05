@@ -23,18 +23,35 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     [SerializeField] private List<PlayerItem> playerItemsList = new List<PlayerItem>();
     [SerializeField] private PlayerItem playerItemPrefab;
     [SerializeField] private Transform contentObjPI;
-  
+
+    [SerializeField] private GameObject playGameBtn;
     void Start()
     {
         //Enter the lobby
         PhotonNetwork.JoinLobby();
     }
 
+    void Update()
+    {
+        if (PhotonNetwork.IsMasterClient && PhotonNetwork.CurrentRoom.PlayerCount >= 2)
+        {
+            playGameBtn.SetActive(true);
+        }
+        else
+        {
+            playGameBtn.SetActive(false);
+        }
+    }
+    public void OnClickPlayGame()
+    {
+        PhotonNetwork.LoadLevel("Game");
+    }
+
     public void OnClickCreateRoom()
     {
         if (roomNameInput.text.Length >= 1)
         {
-            PhotonNetwork.CreateRoom(roomNameInput.text);
+            PhotonNetwork.CreateRoom(roomNameInput.text,new RoomOptions { MaxPlayers = 3,BroadcastPropsChangeToAll = true});
         }
     }
 
